@@ -1,0 +1,92 @@
+name: Materialize media images
+
+on:
+  push:
+    paths:
+      - '.github/workflows/materialize-media.yml'
+      - 'assets/img-media-a.js'
+      - 'assets/img-media-b.js'
+      - 'assets/img-author-white.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract real WebP files from embedded image bundles
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const bundles = [
+            'assets/img-media-a.js',
+            'assets/img-media-b.js',
+            'assets/img-author-white.js'
+          ];
+
+          const images = new Map();
+          for (const file of bundles) {
+            const s = fs.readFileSync(file, 'utf8');
+
+            for (const m of s.matchAll(/"(assets\/[^"]+\.(?:jpg|jpeg))":"data:image\/webp;base64,([A-Za-z0-9+/=]+)"/g)) {
+              images.set(m[1], m[2]);
+            }
+
+            const data = s.match(/const d="data:image\/webp;base64,([A-Za-z0-9+/=]+)"/);
+            const key = s.match(/getAttribute\("src"\)===?"(assets\/[^"]+\.(?:jpg|jpeg))"/);
+            if (data && key) images.set(key[1], data[1]);
+          }
+
+          const expected = [
+            'assets/author-white.jpeg',
+            'assets/media-event-talk.jpg',
+            'assets/media-signing.jpg',
+            'assets/media-portrait-desk.jpg',
+            'assets/media-terrace.jpg',
+            'assets/media-embroidered.jpg'
+          ];
+
+          for (const src of expected) {
+            const b64 = images.get(src);
+            if (!b64) throw new Error(`Embedded image not found: ${src}`);
+            const dest = src.replace(/\.(?:jpg|jpeg)$/i, '.webp');
+            fs.writeFileSync(dest, Buffer.from(b64, 'base64'));
+            console.log(`${src} -> ${dest}`);
+          }
+
+          let html = fs.readFileSync('media.html', 'utf8');
+          for (const src of expected) {
+            const dest = src.replace(/\.(?:jpg|jpeg)$/i, '.webp');
+            html = html.split(src).join(dest);
+          }
+
+          // Real files now exist; remove the old data-URI repair scripts from Media.
+          html = html.replace(/\s*<script src="assets\/(?:img-author-white|img-media-a|img-media-b)\.js[^"]*"><\/script>/g, '');
+
+          // Make the hero image eager and gallery images lazy for stable mobile loading.
+          html = html.replace('<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk">', '<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk" loading="eager" decoding="async">');
+          html = html.replace(/<img src="(assets\/media-[^"]+\.webp)" alt="([^"]+)">/g, '<img src="$1" alt="$2" loading="lazy" decoding="async">');
+
+          fs.writeFileSync('media.html', html);
+          NODE
+
+      - name: Commit materialized media files
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media.html assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Materialize media images for reliable mobile loading"
+            git push origin HEAD:main
+          fi
