@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no" class="notranslate">
 <head>
   <!-- Self-contained HQ build: all styles and images embedded -->
   <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Official website of Ukrainian author Liudmyla Yakovchuk, author of Remember Who You Are — A Ukrainian Family Saga of Love, War, and Memory.">
   <meta property="og:title" content="Liudmyla Yakovchuk — Remember Who You Are">
@@ -492,6 +494,12 @@ a.experience-card:hover{
 }
 
 </style>
+<style id="final-critical-v9">
+html,body{max-width:100%;overflow-x:hidden!important}.site-header{position:sticky;top:0;z-index:50}.mobile-menu-toggle,.mobile-menu{display:none}
+@media(max-width:1050px){.site-header{grid-template-columns:minmax(0,1fr) auto auto!important;gap:12px!important}.site-header>.nav{display:none!important}.mobile-menu-toggle{display:flex!important;width:44px;height:44px;padding:10px;border:0;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;z-index:52}.mobile-menu-toggle span{width:24px;height:2px;background:#4c1d25;display:block;transition:.18s}.mobile-menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}.mobile-menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}.mobile-menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}.mobile-menu{display:block;position:fixed;z-index:49;left:0;right:0;top:76px;bottom:0;background:#fffdf9;padding:18px 28px 28px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-10px);transition:opacity .18s,transform .18s;overflow:auto}.mobile-menu.open{opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important}.mobile-nav{display:flex;flex-direction:column}.mobile-nav a{display:flex;align-items:center;justify-content:space-between;min-height:58px;padding:12px 2px;border-bottom:1px solid #eadfd6;color:#4c1d25;font:500 26px/1.1 Georgia,"Times New Roman",serif}.mobile-nav a:after{content:'→';font-size:18px;color:#b59887}.mobile-menu-footer{display:flex;flex-direction:column;gap:6px;padding-top:24px;color:#8b7b72;font-size:12px}.mobile-menu-footer a{font:16px Georgia,"Times New Roman",serif;color:#4c1d25}.brand{min-width:0}.lang-switch{white-space:nowrap}.novel-band{overflow:hidden}.novel-art:before{inset:10% 0 0 0!important}}
+@media(max-width:680px){.site-header{height:72px!important;padding-left:16px!important;padding-right:10px!important}.mobile-menu{top:72px}.brand-name{font-size:clamp(21px,6.8vw,28px)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand-tag{font-size:6.8px!important;letter-spacing:.20em!important}.lang-switch{font-size:12px!important;gap:3px!important}.hero-skyline{left:0!important;right:0!important}.mobile-menu-toggle{width:42px;height:42px;padding:9px}}
+body.menu-open{overflow:hidden}
+</style>
 </head>
 <body>
 
@@ -515,7 +523,9 @@ a.experience-card:hover{
     <span>|</span>
     <button class="lang" data-lang="uk">УКР</button>
   </div>
+  <button class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
 </header>
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true"><nav class="mobile-nav" aria-label="Mobile navigation"><a href="#home" class="active" data-en="Home" data-uk="Головна">Home</a><a href="#book" data-en="Book" data-uk="Книга">Book</a><a href="#author" data-en="Author" data-uk="Авторка">Author</a><a href="#trailer" data-en="Trailer" data-uk="Трейлер">Trailer</a><a href="media.html" data-en="Media" data-uk="Медіа">Media</a><a href="#contact" data-en="Contact" data-uk="Контакти">Contact</a></nav><div class="mobile-menu-footer"><span data-en="Official author website" data-uk="Офіційний сайт авторки">Official author website</span><a href="mailto:aly2@ukr.net">aly2@ukr.net</a></div></div>
 
 <main>
 <section class="hero" id="home">
@@ -784,6 +794,9 @@ navLinks.forEach(a => {
   });
 });
 
+</script>
+<script id="final-runtime-v9">
+(()=>{'use strict';const OK=new Set(['en','uk']);function initial(){try{const u=new URL(location.href).searchParams.get('lang');if(OK.has(u))return u;const s=localStorage.getItem('liudmyla-site-lang');return OK.has(s)?s:'en'}catch(e){return'en'}}function syncLinks(lang){document.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href')||'';if(!h||h[0]==='#'||h.startsWith('mailto:')||h.startsWith('tel:')||/^https?:/i.test(h))return;try{const u=new URL(h,location.href),f=u.pathname.split('/').pop();if(f===''||f==='index.html'||f==='media.html'){u.searchParams.set('lang',lang);a.setAttribute('href',(f||'index.html')+u.search+u.hash)}}catch(e){}})}function setLang(lang){if(!OK.has(lang))lang='en';document.documentElement.lang=lang==='uk'?'uk':'en';document.querySelectorAll('[data-en][data-uk]').forEach(e=>e.innerHTML=e.dataset[lang]);document.querySelectorAll('.lang[data-lang]').forEach(b=>{const on=b.dataset.lang===lang;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false')});try{localStorage.setItem('liudmyla-site-lang',lang);const u=new URL(location.href);u.searchParams.set('lang',lang);history.replaceState(null,'',u.pathname+u.search+u.hash)}catch(e){}syncLinks(lang)}setLang(initial());document.addEventListener('click',e=>{const b=e.target.closest('.lang[data-lang]');if(b){e.preventDefault();setLang(b.dataset.lang)}});const t=document.querySelector('.mobile-menu-toggle'),m=document.querySelector('.mobile-menu');function close(){if(!m||!t)return;m.classList.remove('open');document.body.classList.remove('menu-open');m.setAttribute('aria-hidden','true');t.setAttribute('aria-expanded','false')}if(t&&m)t.addEventListener('click',()=>{const o=!m.classList.contains('open');m.classList.toggle('open',o);document.body.classList.toggle('menu-open',o);m.setAttribute('aria-hidden',o?'false':'true');t.setAttribute('aria-expanded',o?'true':'false')});m?.addEventListener('click',e=>{if(e.target.closest('a'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(innerWidth>1050)close()})})();
 </script>
 </body>
 </html>
