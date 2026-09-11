@@ -1,6 +1,11 @@
 (() => {
   'use strict';
 
+  const mobileCss = document.createElement('link');
+  mobileCss.rel = 'stylesheet';
+  mobileCss.href = 'assets/mobile.css';
+  document.head.appendChild(mobileCss);
+
   document.documentElement.setAttribute('translate', 'no');
   document.documentElement.classList.add('notranslate');
   if (!document.querySelector('meta[name="google"][content="notranslate"]')) {
