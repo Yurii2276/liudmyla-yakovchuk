@@ -1,15 +1,14 @@
-# Liudmyla Yakovchuk — Self-contained HQ GitHub Pages build
+# Liudmyla Yakovchuk — FINAL RELEASE
 
-This version embeds all styles, JavaScript and high-quality images directly inside the HTML files, so GitHub Pages does not depend on a separate assets folder.
+Final bilingual author website for GitHub Pages.
 
-## Upload to GitHub
-Replace the old site files in the repository root with these files:
-- index.html
-- media.html
-- 404.html
-- .nojekyll
-- README.md
+## Improvements in this release
+- Mobile hamburger menu on Home and Media
+- EN/УКР language state persists between pages
+- Media gallery uses the original high-resolution source photographs
+- All Media images use new filenames to bypass stale browser/CDN caches
+- Media images load eagerly to avoid iPhone lazy-load issues
+- Responsive checks for iPhone, tablet, and desktop
 
-You may leave the old `assets` folder in the repo, but this build no longer needs it.
-
-After upload, wait 1–2 minutes and refresh the site with Ctrl+F5.
+## Upload
+Upload the entire contents of this folder to the repository root. `index.html` and `media.html` must be in the root and the `assets` folder must remain next to them.
