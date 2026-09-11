@@ -1,0 +1,51 @@
+name: Install final Media photos
+
+on:
+  push:
+    paths:
+      - 'media_photos.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install original Media photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f media_photos.zip ]; then
+            echo "media_photos.zip is not present; nothing to install."
+            exit 0
+          fi
+          mkdir -p assets
+          unzip -o media_photos.zip -d assets
+          for f in \
+            media-final-event.jpg \
+            media-final-signing.jpg \
+            media-final-desk.jpg \
+            media-final-terrace.jpg \
+            media-final-embroidered.jpg; do
+              test -s "assets/$f"
+              file "assets/$f"
+          done
+
+      - name: Commit installed photos
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/media-final-*.jpg
+          if git diff --cached --quiet; then
+            echo "Photos already installed."
+          else
+            git commit -m "Install original high-quality Media photos"
+            git push origin HEAD:main
+          fi
