@@ -49,7 +49,7 @@ body.menu-open{overflow:hidden}
       <h1 class="page-title" data-en="The author in conversation with readers" data-uk="Авторка у діалозі з читачами">The author in conversation with readers</h1>
       <p class="page-lead" data-en="A gallery of author portraits, book presentations and moments from the life of the novel Remember Who You Are." data-uk="Галерея авторських портретів, презентацій книги та моментів із життя роману «Пам’ятай, хто ти».">A gallery of author portraits, book presentations and moments from the life of the novel Remember Who You Are.</p>
     </div>
-    <div class="page-hero-photo"><img src="assets/author-white.jpeg" alt="Liudmyla Yakovchuk"></div>
+    <div class="page-hero-photo"><img src="assets/author-white.webp" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async"></div>
   </section>
 
   <section class="media-intro section-pad">
@@ -59,23 +59,23 @@ body.menu-open{overflow:hidden}
   <section class="gallery-section section-pad">
     <div class="gallery-grid">
       <figure class="gallery-card large">
-        <div class="photo-box"><img src="assets/media-event-talk.jpg" alt="Book presentation event"></div>
+        <div class="photo-box"><img src="assets/media-event-talk.webp" alt="Book presentation event" loading="lazy" decoding="async"></div>
         <figcaption><strong data-en="Book Presentation" data-uk="Презентація книги">Book Presentation</strong><span data-en="A public conversation during a book event." data-uk="Публічна розмова під час презентації книги.">A public conversation during a book event.</span></figcaption>
       </figure>
       <figure class="gallery-card">
-        <div class="photo-box"><img src="assets/media-signing.jpg" alt="Liudmyla Yakovchuk signing copies"></div>
+        <div class="photo-box"><img src="assets/media-signing.webp" alt="Liudmyla Yakovchuk signing copies" loading="lazy" decoding="async"></div>
         <figcaption><strong data-en="Signing Copies" data-uk="Підписування примірників">Signing Copies</strong><span data-en="Meeting readers and signing books." data-uk="Зустріч із читачами та підписування книг.">Meeting readers and signing books.</span></figcaption>
       </figure>
       <figure class="gallery-card portrait">
-        <div class="photo-box"><img src="assets/media-portrait-desk.jpg" alt="Author portrait at a writing desk"></div>
+        <div class="photo-box"><img src="assets/media-portrait-desk.webp" alt="Author portrait at a writing desk" loading="lazy" decoding="async"></div>
         <figcaption><strong data-en="Author Portrait" data-uk="Портрет авторки">Author Portrait</strong><span data-en="A quiet editorial-style portrait." data-uk="Спокійний портрет у редакційному стилі.">A quiet editorial-style portrait.</span></figcaption>
       </figure>
       <figure class="gallery-card portrait">
-        <div class="photo-box"><img src="assets/media-terrace.jpg" alt="Liudmyla Yakovchuk on a terrace"></div>
+        <div class="photo-box"><img src="assets/media-terrace.webp" alt="Liudmyla Yakovchuk on a terrace" loading="lazy" decoding="async"></div>
         <figcaption><strong data-en="Summer Portrait" data-uk="Літній портрет">Summer Portrait</strong><span data-en="A warm outdoor portrait of the author." data-uk="Теплий літній портрет авторки.">A warm outdoor portrait of the author.</span></figcaption>
       </figure>
       <figure class="gallery-card">
-        <div class="photo-box"><img src="assets/media-embroidered.jpg" alt="Author portrait in embroidered clothing"></div>
+        <div class="photo-box"><img src="assets/media-embroidered.webp" alt="Author portrait in embroidered clothing" loading="lazy" decoding="async"></div>
         <figcaption><strong data-en="Author Image" data-uk="Образ авторки">Author Image</strong><span data-en="A portrait with a strong artistic and cultural mood." data-uk="Портрет із виразним мистецьким і культурним настроєм.">A portrait with a strong artistic and cultural mood.</span></figcaption>
       </figure>
     </div>
@@ -89,9 +89,6 @@ body.menu-open{overflow:hidden}
   <div class="footer-block"><span class="footer-label" data-en="FOLLOW" data-uk="СОЦМЕРЕЖІ">FOLLOW</span><div class="socials"><a target="_blank" rel="noopener" href="https://www.instagram.com/liudmylayakovchuk2025">Instagram</a><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=IEj6ZYtZcg4">YouTube</a><a target="_blank" rel="noopener" href="https://www.amazon.com.au/dp/B0HHSNX6BC">Amazon</a></div></div>
   <div class="footer-block bilingual"><span class="footer-label" data-en="BILINGUAL WEBSITE" data-uk="ДВОМОВНИЙ САЙТ">BILINGUAL WEBSITE</span><strong>EN &nbsp;|&nbsp; УКР</strong><small data-en="Two languages. One story." data-uk="Дві мови. Одна історія.">Two languages. One story.</small></div>
 </footer>
-
-
-<script src="assets/img-author-white.js?v=final9"></script><script src="assets/img-media-a.js?v=final9"></script><script src="assets/img-media-b.js?v=final9"></script>
 <script id="final-runtime-v9">
 (()=>{'use strict';const OK=new Set(['en','uk']);function initial(){try{const u=new URL(location.href).searchParams.get('lang');if(OK.has(u))return u;const s=localStorage.getItem('liudmyla-site-lang');return OK.has(s)?s:'en'}catch(e){return'en'}}function syncLinks(lang){document.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href')||'';if(!h||h[0]==='#'||h.startsWith('mailto:')||h.startsWith('tel:')||/^https?:/i.test(h))return;try{const u=new URL(h,location.href),f=u.pathname.split('/').pop();if(f===''||f==='index.html'||f==='media.html'){u.searchParams.set('lang',lang);a.setAttribute('href',(f||'index.html')+u.search+u.hash)}}catch(e){}})}function setLang(lang){if(!OK.has(lang))lang='en';document.documentElement.lang=lang==='uk'?'uk':'en';document.querySelectorAll('[data-en][data-uk]').forEach(e=>e.innerHTML=e.dataset[lang]);document.querySelectorAll('.lang[data-lang]').forEach(b=>{const on=b.dataset.lang===lang;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false')});try{localStorage.setItem('liudmyla-site-lang',lang);const u=new URL(location.href);u.searchParams.set('lang',lang);history.replaceState(null,'',u.pathname+u.search+u.hash)}catch(e){}syncLinks(lang)}setLang(initial());document.addEventListener('click',e=>{const b=e.target.closest('.lang[data-lang]');if(b){e.preventDefault();setLang(b.dataset.lang)}});const t=document.querySelector('.mobile-menu-toggle'),m=document.querySelector('.mobile-menu');function close(){if(!m||!t)return;m.classList.remove('open');document.body.classList.remove('menu-open');m.setAttribute('aria-hidden','true');t.setAttribute('aria-expanded','false')}if(t&&m)t.addEventListener('click',()=>{const o=!m.classList.contains('open');m.classList.toggle('open',o);document.body.classList.toggle('menu-open',o);m.setAttribute('aria-hidden',o?'false':'true');t.setAttribute('aria-expanded',o?'true':'false')});m?.addEventListener('click',e=>{if(e.target.closest('a'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(innerWidth>1050)close()})})();
 </script>
