@@ -35,7 +35,6 @@ jobs:
             'assets/media-terrace.jpg',
             'assets/media-embroidered.jpg'
           ];
-
           const bundles = [
             'assets/img-media-a.js',
             'assets/img-media-b.js',
@@ -65,50 +64,33 @@ jobs:
             const uri = collected.get(src);
             if (!uri) throw new Error(`Embedded image not found: ${src}`);
             const comma = uri.indexOf(',');
-            if (comma < 0) throw new Error(`Invalid data URI: ${src}`);
             const dest = src.replace(/\.(?:jpg|jpeg)$/i, '.webp');
             fs.writeFileSync(dest, Buffer.from(uri.slice(comma + 1), 'base64'));
-            console.log(`${src} -> ${dest}`);
           }
           NODE
 
-          echo "Image types before conversion:"
           file assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp
-
-          if command -v magick >/dev/null 2>&1; then
-            IMG=magick
-          else
-            IMG=convert
-          fi
+          command -v ffmpeg
 
           for f in assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp; do
             out="${f%.webp}.jpg"
-            "$IMG" "$f" -auto-orient -strip -quality 92 "$out"
+            ffmpeg -loglevel error -y -i "$f" -q:v 2 "$out"
             file "$out"
           done
 
           node <<'NODE'
           const fs = require('fs');
           let html = fs.readFileSync('media.html', 'utf8');
-
-          const names = [
-            'author-white',
-            'media-event-talk',
-            'media-signing',
-            'media-portrait-desk',
-            'media-terrace',
-            'media-embroidered'
-          ];
+          const names = ['author-white','media-event-talk','media-signing','media-portrait-desk','media-terrace','media-embroidered'];
           for (const n of names) {
             html = html.replaceAll(`assets/${n}.webp`, `assets/${n}.jpg`);
             html = html.replaceAll(`assets/${n}.jpeg`, `assets/${n}.jpg`);
           }
-
           html = html.replace(/\s*<script src="assets\/(?:img-author-white|img-media-a|img-media-b)\.js[^"]*"><\/script>/g, '');
-          html = html.replace(/<img src="assets\/author-white\.jpg" alt="Liudmyla Yakovchuk"[^>]*>/,
-            '<img src="assets/author-white.jpg?v=3" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async">');
+          html = html.replace(/<img src="assets\/author-white\.jpg(?:\?[^\"]*)?" alt="Liudmyla Yakovchuk"[^>]*>/,
+            '<img src="assets/author-white.jpg?v=4" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async">');
           html = html.replace(/<img src="(assets\/media-[^"]+\.jpg)(?:\?[^\"]*)?" alt="([^"]+)"[^>]*>/g,
-            '<img src="$1?v=3" alt="$2" loading="lazy" decoding="async">');
+            '<img src="$1?v=4" alt="$2" loading="lazy" decoding="async">');
           fs.writeFileSync('media.html', html);
           NODE
 
@@ -127,6 +109,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nothing to commit"
           else
-            git commit -m "Use Safari-safe JPEG media images"
+            git commit -m "Use JPEG images for Media compatibility"
             git push origin HEAD:main
           fi
