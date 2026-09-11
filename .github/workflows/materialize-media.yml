@@ -41,8 +41,9 @@ jobs:
             }
 
             const data = s.match(/const d="data:image\/webp;base64,([A-Za-z0-9+/=]+)"/);
-            const key = s.match(/getAttribute\("src"\)===?"(assets\/[^"]+\.(?:jpg|jpeg))"/);
-            if (data && key) images.set(key[1], data[1]);
+            if (data && s.includes('assets/author-white.jpeg')) {
+              images.set('assets/author-white.jpeg', data[1]);
+            }
           }
 
           const expected = [
