@@ -1,10 +1,12 @@
 (() => {
   'use strict';
 
-  const mobileCss = document.createElement('link');
-  mobileCss.rel = 'stylesheet';
-  mobileCss.href = 'assets/mobile.css';
-  document.head.appendChild(mobileCss);
+  if (!document.querySelector('link[href="assets/mobile.css"]')) {
+    const mobileCss = document.createElement('link');
+    mobileCss.rel = 'stylesheet';
+    mobileCss.href = 'assets/mobile.css';
+    document.head.appendChild(mobileCss);
+  }
 
   document.documentElement.setAttribute('translate', 'no');
   document.documentElement.classList.add('notranslate');
@@ -202,17 +204,42 @@
   window.addEventListener('resize', () => { if (window.innerWidth > 1050) closeMenu(); });
   window.addEventListener('hashchange', updateActiveNav);
 
-  [
-    'assets/img-author-white.js',
-    'assets/img-author-gray.js',
-    'assets/img-cover.js',
-    'assets/img-books.js',
-    'assets/img-media-a.js',
-    'assets/img-media-b.js'
-  ].forEach(src => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.defer = true;
-    document.head.appendChild(script);
-  });
+  // Load image-repair assets deterministically. This prevents broken placeholders on slower mobile connections.
+  function loadScript(src) {
+    return new Promise(resolve => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = false;
+      s.onload = () => resolve(true);
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+  }
+
+  async function repairImages() {
+    const files = [
+      'assets/img-author-white.js',
+      'assets/img-author-gray.js',
+      'assets/img-cover.js',
+      'assets/img-books.js'
+    ];
+    for (const src of files) await loadScript(src);
+
+    // Use the higher-quality gallery sprite where available.
+    const hqSpriteLoaded = await loadScript('assets/media-sprite-hq.js');
+    if (hqSpriteLoaded && window.MEDIA_SPRITE) {
+      document.querySelectorAll('.media-sprite').forEach(el => {
+        el.style.backgroundImage = `url("${window.MEDIA_SPRITE}")`;
+      });
+    } else {
+      await loadScript('assets/img-media-a.js');
+      await loadScript('assets/img-media-b.js');
+    }
+
+    document.querySelectorAll('img').forEach(img => {
+      if (img.complete && img.naturalWidth > 0) img.classList.add('image-ready');
+      img.addEventListener('load', () => img.classList.add('image-ready'), {once:true});
+    });
+  }
+  repairImages();
 })();
