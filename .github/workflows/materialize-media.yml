@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract real WebP files from embedded image bundles
+      - name: Extract images and create Safari-safe JPEGs
         shell: bash
         run: |
           node <<'NODE'
@@ -43,7 +43,6 @@ jobs:
           ];
 
           const collected = new Map();
-
           function fakeImage(key) {
             let value = key;
             return {
@@ -51,9 +50,7 @@ jobs:
               get src() { return value; },
               set src(v) {
                 value = v;
-                if (typeof v === 'string' && v.startsWith('data:image/')) {
-                  collected.set(key, v);
-                }
+                if (typeof v === 'string' && v.startsWith('data:image/')) collected.set(key, v);
               }
             };
           }
@@ -61,9 +58,7 @@ jobs:
           for (const file of bundles) {
             const code = fs.readFileSync(file, 'utf8');
             const imgs = expected.map(fakeImage);
-            vm.runInNewContext(code, {
-              document: { querySelectorAll: () => imgs }
-            }, { filename: file });
+            vm.runInNewContext(code, { document: { querySelectorAll: () => imgs } }, { filename: file });
           }
 
           for (const src of expected) {
@@ -75,32 +70,63 @@ jobs:
             fs.writeFileSync(dest, Buffer.from(uri.slice(comma + 1), 'base64'));
             console.log(`${src} -> ${dest}`);
           }
+          NODE
 
+          echo "Image types before conversion:"
+          file assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp
+
+          if command -v magick >/dev/null 2>&1; then
+            IMG=magick
+          else
+            IMG=convert
+          fi
+
+          for f in assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp; do
+            out="${f%.webp}.jpg"
+            "$IMG" "$f" -auto-orient -strip -quality 92 "$out"
+            file "$out"
+          done
+
+          node <<'NODE'
+          const fs = require('fs');
           let html = fs.readFileSync('media.html', 'utf8');
-          for (const src of expected) {
-            const dest = src.replace(/\.(?:jpg|jpeg)$/i, '.webp');
-            html = html.split(src).join(dest);
+
+          const names = [
+            'author-white',
+            'media-event-talk',
+            'media-signing',
+            'media-portrait-desk',
+            'media-terrace',
+            'media-embroidered'
+          ];
+          for (const n of names) {
+            html = html.replaceAll(`assets/${n}.webp`, `assets/${n}.jpg`);
+            html = html.replaceAll(`assets/${n}.jpeg`, `assets/${n}.jpg`);
           }
 
-          // Real files now exist; remove the old data-URI repair scripts from Media.
           html = html.replace(/\s*<script src="assets\/(?:img-author-white|img-media-a|img-media-b)\.js[^"]*"><\/script>/g, '');
-
-          // Stable mobile loading: hero first, gallery on demand.
-          html = html.replace('<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk">', '<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async">');
-          html = html.replace(/<img src="(assets\/media-[^"]+\.webp)" alt="([^"]+)">/g, '<img src="$1" alt="$2" loading="lazy" decoding="async">');
-
+          html = html.replace(/<img src="assets\/author-white\.jpg" alt="Liudmyla Yakovchuk"[^>]*>/,
+            '<img src="assets/author-white.jpg?v=3" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async">');
+          html = html.replace(/<img src="(assets\/media-[^"]+\.jpg)(?:\?[^\"]*)?" alt="([^"]+)"[^>]*>/g,
+            '<img src="$1?v=3" alt="$2" loading="lazy" decoding="async">');
           fs.writeFileSync('media.html', html);
           NODE
 
-      - name: Commit materialized media files
+      - name: Commit Safari-safe media files
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add media.html assets/author-white.webp assets/media-event-talk.webp assets/media-signing.webp assets/media-portrait-desk.webp assets/media-terrace.webp assets/media-embroidered.webp
+          git add media.html \
+            assets/author-white.jpg \
+            assets/media-event-talk.jpg \
+            assets/media-signing.jpg \
+            assets/media-portrait-desk.jpg \
+            assets/media-terrace.jpg \
+            assets/media-embroidered.jpg
           if git diff --cached --quiet; then
             echo "Nothing to commit"
           else
-            git commit -m "Materialize media images for reliable mobile loading"
+            git commit -m "Use Safari-safe JPEG media images"
             git push origin HEAD:main
           fi
