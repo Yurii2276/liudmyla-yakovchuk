@@ -1,0 +1,38 @@
+name: Fix Media hero image
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-media-hero.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace unreliable hero image with known-good portrait
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('media.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('assets/author-white.webp', 'assets/author-gray.jpeg?v=5')
+          s = s.replace('assets/author-white.jpg?v=4', 'assets/author-gray.jpeg?v=5')
+          s = s.replace('assets/author-white.jpg', 'assets/author-gray.jpeg?v=5')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media.html
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Fix Media hero image on mobile"
+            git push origin HEAD:main
+          fi
