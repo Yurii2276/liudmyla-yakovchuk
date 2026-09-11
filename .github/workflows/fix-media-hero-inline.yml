@@ -1,0 +1,50 @@
+name: Fix Media hero inline
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-media-hero-inline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch Media hero to embedded image fallback
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'media.html';
+          let html = fs.readFileSync(file, 'utf8');
+
+          // Use the exact source expected by img-author-gray.js.
+          html = html.replace(/src="assets\/author-gray\.jpeg(?:\?[^\"]*)?"/g,
+            'src="assets/author-gray.jpeg"');
+
+          // Remove older copies if any, then load the embedded image bundle after the DOM.
+          html = html.replace(/\s*<script src="assets\/img-author-gray\.js[^\"]*"><\/script>/g, '');
+          html = html.replace('</body>', '\n<script src="assets/img-author-gray.js?v=6"></script>\n</body>');
+
+          fs.writeFileSync(file, html);
+          NODE
+
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media.html
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Use embedded Media hero image for iPhone Safari"
+            git push origin HEAD:main
+          fi
