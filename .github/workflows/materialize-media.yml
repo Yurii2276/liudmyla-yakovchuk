@@ -25,26 +25,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs = require('fs');
-
-          const bundles = [
-            'assets/img-media-a.js',
-            'assets/img-media-b.js',
-            'assets/img-author-white.js'
-          ];
-
-          const images = new Map();
-          for (const file of bundles) {
-            const s = fs.readFileSync(file, 'utf8');
-
-            for (const m of s.matchAll(/"(assets\/[^"]+\.(?:jpg|jpeg))":"data:image\/webp;base64,([A-Za-z0-9+/=]+)"/g)) {
-              images.set(m[1], m[2]);
-            }
-
-            const data = s.match(/const d="data:image\/webp;base64,([A-Za-z0-9+/=]+)"/);
-            if (data && s.includes('assets/author-white.jpeg')) {
-              images.set('assets/author-white.jpeg', data[1]);
-            }
-          }
+          const vm = require('vm');
 
           const expected = [
             'assets/author-white.jpeg',
@@ -55,11 +36,43 @@ jobs:
             'assets/media-embroidered.jpg'
           ];
 
+          const bundles = [
+            'assets/img-media-a.js',
+            'assets/img-media-b.js',
+            'assets/img-author-white.js'
+          ];
+
+          const collected = new Map();
+
+          function fakeImage(key) {
+            let value = key;
+            return {
+              getAttribute(name) { return name === 'src' ? key : null; },
+              get src() { return value; },
+              set src(v) {
+                value = v;
+                if (typeof v === 'string' && v.startsWith('data:image/')) {
+                  collected.set(key, v);
+                }
+              }
+            };
+          }
+
+          for (const file of bundles) {
+            const code = fs.readFileSync(file, 'utf8');
+            const imgs = expected.map(fakeImage);
+            vm.runInNewContext(code, {
+              document: { querySelectorAll: () => imgs }
+            }, { filename: file });
+          }
+
           for (const src of expected) {
-            const b64 = images.get(src);
-            if (!b64) throw new Error(`Embedded image not found: ${src}`);
+            const uri = collected.get(src);
+            if (!uri) throw new Error(`Embedded image not found: ${src}`);
+            const comma = uri.indexOf(',');
+            if (comma < 0) throw new Error(`Invalid data URI: ${src}`);
             const dest = src.replace(/\.(?:jpg|jpeg)$/i, '.webp');
-            fs.writeFileSync(dest, Buffer.from(b64, 'base64'));
+            fs.writeFileSync(dest, Buffer.from(uri.slice(comma + 1), 'base64'));
             console.log(`${src} -> ${dest}`);
           }
 
@@ -72,8 +85,8 @@ jobs:
           // Real files now exist; remove the old data-URI repair scripts from Media.
           html = html.replace(/\s*<script src="assets\/(?:img-author-white|img-media-a|img-media-b)\.js[^"]*"><\/script>/g, '');
 
-          // Make the hero image eager and gallery images lazy for stable mobile loading.
-          html = html.replace('<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk">', '<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk" loading="eager" decoding="async">');
+          // Stable mobile loading: hero first, gallery on demand.
+          html = html.replace('<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk">', '<img src="assets/author-white.webp" alt="Liudmyla Yakovchuk" loading="eager" fetchpriority="high" decoding="async">');
           html = html.replace(/<img src="(assets\/media-[^"]+\.webp)" alt="([^"]+)">/g, '<img src="$1" alt="$2" loading="lazy" decoding="async">');
 
           fs.writeFileSync('media.html', html);
