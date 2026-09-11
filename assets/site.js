@@ -30,18 +30,35 @@
     menuToggle.innerHTML = '<span></span><span></span><span></span>';
     header.appendChild(menuToggle);
   }
-  if (header && desktopNav && !mobileMenu) {
-    mobileMenu = document.createElement('div');
-    mobileMenu.className = 'mobile-menu';
-    mobileMenu.id = 'mobile-menu';
-    mobileMenu.setAttribute('aria-hidden', 'true');
-    mobileMenu.innerHTML = `
-      <nav class="mobile-nav" aria-label="Mobile navigation">${desktopNav.innerHTML}</nav>
-      <div class="mobile-menu-footer">
+
+  if (header && desktopNav) {
+    if (!mobileMenu) {
+      mobileMenu = document.createElement('div');
+      mobileMenu.className = 'mobile-menu';
+      mobileMenu.id = 'mobile-menu';
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      header.insertAdjacentElement('afterend', mobileMenu);
+    }
+
+    let mobileNav = mobileMenu.querySelector('.mobile-nav');
+    if (!mobileNav || mobileNav.querySelectorAll('a').length === 0) {
+      const freshNav = desktopNav.cloneNode(true);
+      freshNav.className = 'mobile-nav';
+      freshNav.setAttribute('aria-label', 'Mobile navigation');
+      if (mobileNav) mobileNav.replaceWith(freshNav);
+      else mobileMenu.prepend(freshNav);
+      mobileNav = freshNav;
+    }
+
+    let mobileFooter = mobileMenu.querySelector('.mobile-menu-footer');
+    if (!mobileFooter) {
+      mobileFooter = document.createElement('div');
+      mobileFooter.className = 'mobile-menu-footer';
+      mobileFooter.innerHTML = `
         <span data-en="Official author website" data-uk="Офіційний сайт авторки">Official author website</span>
-        <a href="mailto:aly2@ukr.net">aly2@ukr.net</a>
-      </div>`;
-    header.insertAdjacentElement('afterend', mobileMenu);
+        <a href="mailto:aly2@ukr.net">aly2@ukr.net</a>`;
+      mobileMenu.appendChild(mobileFooter);
+    }
   }
 
   const VALID_LANGS = new Set(['en', 'uk']);
