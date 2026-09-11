@@ -1,0 +1,31 @@
+name: Finalize author site
+
+on:
+  push:
+    paths:
+      - '.github/workflows/finalize-site.yml'
+      - 'tools/finalize_site.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Apply final mobile, language and media fixes
+        run: python tools/finalize_site.py
+      - name: Commit generated fixes
+        run: |
+          if git diff --quiet -- index.html media.html; then
+            echo "No site changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html media.html
+          git commit -m "Finalize mobile navigation, language switching and media photos"
+          git push
