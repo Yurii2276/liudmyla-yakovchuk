@@ -578,6 +578,98 @@ body.menu-open{overflow:hidden}
     .gallery-card.large .photo-box img{aspect-ratio:auto!important;}
   }
 </style>
+
+<style id="desktop-media-final-fix">
+/* =========================================================
+   DESKTOP MEDIA FINAL FIX
+   Desktop only (min-width: 1051px).
+   Mobile/tablet styles are left unchanged.
+   ========================================================= */
+@media (min-width: 1051px) {
+
+  /* Make every desktop card explicitly include its caption */
+  .gallery-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: start !important;
+    height: auto !important;
+  }
+
+  .gallery-card figcaption {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 2 !important;
+    flex: 0 0 auto !important;
+    padding: 16px 18px 18px !important;
+    background: #fbf8f4 !important;
+  }
+
+  .gallery-card figcaption strong {
+    display: block !important;
+    margin: 0 0 6px !important;
+    color: #5a2430 !important;
+    font: 500 24px/1.08 Georgia, "Times New Roman", serif !important;
+  }
+
+  .gallery-card figcaption span {
+    display: block !important;
+    color: #786b64 !important;
+    font: 14px/1.45 Georgia, "Times New Roman", serif !important;
+  }
+
+  /* 1. Book Presentation:
+     show the FULL original photo — no cropping */
+  .gallery-card.large:first-child > img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #f8f4ee !important;
+  }
+
+  /* 2. Signing Copies — full vertical image, caption visible below */
+  .gallery-card:nth-child(2) > img {
+    width: 100% !important;
+    height: 600px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #f8f4ee !important;
+  }
+
+  /* 3. Author Portrait */
+  .gallery-card:nth-child(3) > img {
+    width: 100% !important;
+    height: 360px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #f8f4ee !important;
+  }
+
+  /* 4. Summer Portrait */
+  .gallery-card:nth-child(4) > img {
+    width: 100% !important;
+    height: 600px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #f8f4ee !important;
+  }
+
+  /* 5. Author Image */
+  .gallery-card:nth-child(5) > img {
+    width: 100% !important;
+    height: 420px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #f8f4ee !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <!-- final-v8 2026-09-11 -->
